@@ -45,73 +45,86 @@ T2S-FINOPS-GCP/
 ## Prerequisites
 
 Before deploying, ensure you have:
-	•	Terraform installed (>= 1.5.0)
-	•	Google Cloud SDK installed & authenticated (gcloud auth application-default login)
-	•	A Google Cloud project with billing enabled
-	•	A GCS bucket for Terraform state storage
+- Terraform installed (>= 1.5.0)
+- Google Cloud SDK installed & authenticated (gcloud auth application-default login)
+- A Google Cloud project with billing enabled
+- A GCS bucket for Terraform state storage
 
-Step 1: Backend (State Management)
-	•	Navigate to /modules/backend/ and configure the Terraform backend:
+---
 
+## Step 1: Backend (State Management)
+- Navigate to /modules/backend/ and configure the Terraform backend:
+```hcl 
 bucket         = "t2s-finops-terraform-state"
 prefix         = "state/finops.tfstate"
+```
 
-	•	Run:
-
+- Run:
+```bash
 terraform init
 terraform validate
 terraform apply -auto-approve
+```
 
-Step 2: Configure Variables
 
-Modify terraform.tfvars in environments/dev/:
+## Step 2: Configure Variables
 
+- Modify **terraform.tfvars** in environments/dev/:
+```hcl
 gcp_region         = "us-central1"
 billing_account_id = "123456-789ABC-DEF012"
 project_id         = "t2s-finops"
 storage_bucket     = "t2s-finops-reports"
+```
 
-Modify backend.tf:
-
+- Modify **backend.tf**:
+```hcl
 terraform {
   backend "gcs" {
     bucket  = "t2s-finops-terraform-state"
     prefix  = "state/finops.tfstate"
   }
 }
+```
 
-Step 3: Deploy the Infrastructure
-
+## Step 3: Deploy the Infrastructure
+```bash
 cd environments/dev
 terraform init
 terraform plan -var-file="terraform.tfvars"
 terraform apply -var-file="terraform.tfvars" -auto-approve
+```
 
-Step 4: Verify Resources
-
+## Step 4: Verify Resources
+```hcl
 gcloud billing budgets list --billing-account=123456-789ABC-DEF012
 gcloud logging logs list
 gcloud functions list | grep finops-auto-optimizer
+```
 
-Step 5: Deploy to Other Environments
-
+## Step 5: Deploy to Other Environments
+```bash
 cd environments/stage
 terraform apply -var-file="terraform.tfvars" -auto-approve
 
 cd environments/prod
 terraform apply -var-file="terraform.tfvars" -auto-approve
+```
 
-Step 6: Destroy the Infrastructure
-
+## Step 6: Destroy the Infrastructure
+```bash
 terraform destroy -var-file="terraform.tfvars" -auto-approve
 gcloud storage rm --recursive gs://t2s-finops-terraform-state
+```
 
-Key Takeaways
-	•	Terraform for GCP FinOps scalability
-	•	Cost monitoring with Cloud Budgets
-	•	Cloud Functions for auto-optimization
-	•	Security Command Center for monitoring
-	•	GCS for storing cost reports
+---
+
+## Key Takeaways
+- **Terraform** for GCP FinOps scalability
+- Cost monitoring with **Cloud Budgets**
+- **Cloud Functions** for auto-optimization
+- **Security Command Center** for monitoring
+- **GCS** for storing cost reports
 
 
 
